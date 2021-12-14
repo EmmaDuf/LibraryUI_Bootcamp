@@ -23,73 +23,191 @@ namespace ClassLibraryDatabase
         public List<Role> GetRolesFromDb()
         {
             List<Role> _list = new List<Role>();
-            using (SqlConnection con = new SqlConnection(_conn))
+            try
             {
-                //pass the name of the stored procedure and the connection
-                using (SqlCommand _sqlCommand = new SqlCommand("spGetRoles", con))
+                using (SqlConnection con = new SqlConnection(_conn))
                 {
-                    _sqlCommand.CommandType = CommandType.StoredProcedure;
-                    _sqlCommand.CommandTimeout = 30;
-                    //potential for a lot of errors .Open()
-                    con.Open();
-                    Role _role; // = new Role();
-                    using (SqlDataReader reader = _sqlCommand.ExecuteReader())
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spGetRoles", con))
                     {
-                        while (reader.Read())
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //potential for a lot of errors .Open()
+                        con.Open();
+                        Role _role; // = new Role();
+                        using (SqlDataReader reader = _sqlCommand.ExecuteReader())
                         {
-                            //initilizer {}
-                            _role = new Role
+                            while (reader.Read())
                             {
-                                //index out of range exception, initialize everything at once
-                                //Giancarlo was not able to find the error
-                                RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
-                                RoleName = (string)reader["RoleName"]
-                                //DateModified = reader.GetDateTime(reader.GetOrdinal("DateModified"))
-                            };
-                            _list.Add(_role); //add object to the list object
+                                //initilizer {}
+                                _role = new Role
+                                {
+                                    //index out of range exception, initialize everything at once
+                                    //Giancarlo was not able to find the error
+                                    RoleID = reader.GetInt32(reader.GetOrdinal("RoleID")),
+                                    RoleName = (string)reader["RoleName"]
+                                    //DateModified = reader.GetDateTime(reader.GetOrdinal("DateModified"))
+                                };
+                                _list.Add(_role); //add object to the list object
+                            }
                         }
+                        con.Close(); //close the connection to the server.database.table
+                        return _list;
                     }
-                    con.Close(); //close the connection to the server.database.table
                 }
             }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            
             return _list; // each object represents a row of our data in the table
         }
         public List<User> GetUsersFromDb()
         {
             List<User> _list = new List<User>();
-            using (SqlConnection con = new SqlConnection(_conn))
+            try
             {
-                //pass the name of the stored procedure and the connection
-                using (SqlCommand _sqlCommand = new SqlCommand("spGetUsers", con))
+                using (SqlConnection con = new SqlConnection(_conn))
                 {
-                    _sqlCommand.CommandType = CommandType.StoredProcedure;
-                    _sqlCommand.CommandTimeout = 30;
-                    //potential for a lot of errors .Open()
-                    con.Open();
-                    User _user; // = new Role();
-                    using (SqlDataReader reader = _sqlCommand.ExecuteReader())
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spGetUsers", con))
                     {
-                        while (reader.Read())
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //potential for a lot of errors .Open()
+                        con.Open();
+                        User _user; // = new Role();
+                        using (SqlDataReader reader = _sqlCommand.ExecuteReader())
                         {
-                            //initilizer {}
-                            _user = new User
+                            while (reader.Read())
                             {
-                                //index out of range exception, initialize everything at once
-                                //Giancarlo was not able to find the error
-                                UserID = reader.GetInt32(reader.GetOrdinal("UserID")),
-                                UserName = (string)reader["UserName"],
-                                FirstName = (string)reader["FirstName"],
-                                LastName = (string)reader["LastName"],
-                                Password = (string)reader["Password"],
-                                RoleID_FK = (int)reader["RoleID_FK"]
-                                //DateModified = reader.GetDateTime(reader.GetOrdinal("DateModified"))
-                            };
-                            _list.Add(_user); //add object to the list object
+                                //initilizer {}
+                                _user = new User
+                                {
+                                    //index out of range exception, initialize everything at once
+                                    //Giancarlo was not able to find the error
+                                    UserID = reader.GetInt32(reader.GetOrdinal("UserID")),
+                                    UserName = (string)reader["UserName"],
+                                    FirstName = (string)reader["FirstName"],
+                                    LastName = (string)reader["LastName"],
+                                    Password = (string)reader["Password"],
+                                    RoleID_FK = (int)reader["RoleID_FK"]
+                                    //DateModified = reader.GetDateTime(reader.GetOrdinal("DateModified"))
+                                };
+                                _list.Add(_user); //add object to the list object
+                            }
                         }
+                        con.Close(); //close the connection to the server.database.table
+                        return _list;
                     }
-                    con.Close(); //close the connection to the server.database.table
                 }
             }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            
+            return _list; // each object represents a row of our data in the table
+        }
+        public List<Author> GetAuthorsFromDb()
+        {
+            List<Author> _list = new List<Author>();
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spGetAuthors", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //potential for a lot of errors .Open()
+                        con.Open();
+                        Author _author; // = new Role();
+                        using (SqlDataReader reader = _sqlCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                //initilizer {}
+                                _author = new Author
+                                {
+                                    //index out of range exception, initialize everything at once
+                                    //Giancarlo was not able to find the error
+                                    AuthorID = reader.GetInt32(reader.GetOrdinal("AuthorID")),
+                                    FirstName = (string)reader["FirstName"],
+                                    LastName = (string)reader["LastName"],
+                                    
+                                    Comment = ConvertFromDBVal<string>(reader["Comment"])
+                                    //DateModified = reader.GetDateTime(reader.GetOrdinal("DateModified"))
+                                };
+                                _list.Add(_author); //add object to the list object
+                            }
+                        }
+                        con.Close(); //close the connection to the server.database.table
+                        return _list;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+
+            return _list; // each object represents a row of our data in the table
+        }
+        public List<Book> GetBooksFromDb()
+        {
+            List<Book> _list = new List<Book>();
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spGetBooks", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //potential for a lot of errors .Open()
+                        con.Open();
+                        Book _book; // = new Book();
+                        using (SqlDataReader reader = _sqlCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                //var Published_Date = ConvertFromDBVal<DateTime>(reader.GetDateTime(reader.GetOrdinal("Published_Date")));
+
+                                //var Checked_Out = reader.IsDBNull(reader.GetOrdinal("Checked_Out")) ? false : (bool)reader.GetSqlBoolean(reader.GetOrdinal("Checked_Out"));
+                                //var Checkout_Date = reader.IsDBNull(reader.GetOrdinal("Checkout_Date")) ? DateTime.Now: ConvertFromDBVal<DateTime>(reader.GetSqlDateTime(reader.GetOrdinal("Checkout_Date")));
+                               // var Checked_Out_ByUser_FK = ConvertFromDBVal<int>(reader.GetOrdinal("Checked_Out_ByUserID_FK"));
+                               
+
+                            //initilizer {}
+                            _book = new Book
+                                {
+                                    BookID = reader.GetInt32(reader.GetOrdinal("BookID")),
+                                    AuthorID_FK = reader.GetInt32(reader.GetOrdinal("AuthorID_FK")),
+                                    Title = (string)reader["Title"],
+                                    Genre = (string)reader["Genre"],
+                                    Published_Date = ConvertFromDBVal<DateTime>(reader.GetDateTime(reader.GetOrdinal("Published_Date"))),
+
+                                    Checked_Out = reader.IsDBNull(reader.GetOrdinal("Checked_Out")) ? false : (bool)reader.GetSqlBoolean(reader.GetOrdinal("Checked_Out")),
+                                    Checkout_Date = reader.IsDBNull(reader.GetOrdinal("Checkout_Date")) ? DateTime.Now : ConvertFromDBVal<DateTime>(reader.GetSqlDateTime(reader.GetOrdinal("Checkout_Date"))),
+                                    Checked_Out_ByUser_FK = reader.IsDBNull(reader.GetOrdinal("Checked_Out_ByUserID_FK")) ? -1: ConvertFromDBVal<int>(reader.GetInt32(reader.GetOrdinal("Checked_Out_ByUserID_FK")))
+                            };
+                                _list.Add(_book); //add object to the list object
+                            }
+                        }
+                        con.Close(); //close the connection to the server.database.table
+                        return _list;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+
             return _list; // each object represents a row of our data in the table
         }
         public string GetRoleNameofUserFromDb(User u)
@@ -246,13 +364,25 @@ namespace ClassLibraryDatabase
                         _paramRoleID_FK.ParameterName = "@RoleID_FK";
                         _paramRoleID_FK.Value = u.RoleID_FK;
                         _sqlCommand.Parameters.Add(_paramRoleID_FK);
+                        //Email
+                        SqlParameter _paramEmail = _sqlCommand.CreateParameter();
+                        _paramEmail.DbType = DbType.String;
+                        _paramEmail.ParameterName = "@Email";
+                        _paramEmail.Value = u.Email;
+                        _sqlCommand.Parameters.Add(_paramEmail);
+                        //PhoneNumber
+                        SqlParameter _paramPhonenumber = _sqlCommand.CreateParameter();
+                        _paramPhonenumber.DbType = DbType.String;
+                        _paramPhonenumber.ParameterName = "@PhoneNumber";
+                        _paramPhonenumber.Value = u.PhoneNumber;
+                        _sqlCommand.Parameters.Add(_paramPhonenumber);
                         //Output value specs
                         SqlParameter _paramUserIDReturn = _sqlCommand.CreateParameter();
                         //auto-incremented specification
                         _paramUserIDReturn.Direction = ParameterDirection.Output;
                         _paramUserIDReturn.DbType = DbType.Int32;
                         //Getting the value that is being auto-incrememnted back
-                        _paramUserIDReturn.ParameterName = "@OutUserID";
+                        _paramUserIDReturn.ParameterName = "@UserID";
                         var pk = _sqlCommand.Parameters.Add(_paramUserIDReturn);
                         con.Open();
                         _sqlCommand.ExecuteNonQuery(); //calls the sp
@@ -271,8 +401,131 @@ namespace ClassLibraryDatabase
             return result;
 
         }
+        public int CreateAuthorToDb(Author a)
+        {
+            int result;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCreateAuthor", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+
+                        
+                        //@FirstName varchar(200),@LastName varchar(200),@Password varchar(200), @RoleID_FK int
+                        SqlParameter _paramFirstName = _sqlCommand.CreateParameter();
+                        _paramFirstName.DbType = DbType.String;
+                        _paramFirstName.ParameterName = "@FirstName";
+                        _paramFirstName.Value = a.FirstName;
+                        _sqlCommand.Parameters.Add(_paramFirstName);
+                        //LastName
+                        SqlParameter _paramLastName = _sqlCommand.CreateParameter();
+                        _paramLastName.DbType = DbType.String;
+                        _paramLastName.ParameterName = "@LastName";
+                        _paramLastName.Value = a.LastName;
+                        _sqlCommand.Parameters.Add(_paramLastName);
+                        //Password
+                        SqlParameter _paramComment = _sqlCommand.CreateParameter();
+                        _paramComment.DbType = DbType.String;
+                        _paramComment.ParameterName = "@Comment";
+                        _paramComment.Value = ConvertFromDBVal<string>(a.Comment);
+                        _sqlCommand.Parameters.Add(_paramComment);
+                        //Output value specs
+                        SqlParameter _paramAuthorIDReturn = _sqlCommand.CreateParameter();
+                        //auto-incremented specification
+                        _paramAuthorIDReturn.Direction = ParameterDirection.Output;
+                        _paramAuthorIDReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramAuthorIDReturn.ParameterName = "@AuthorID";
+                        var pk = _sqlCommand.Parameters.Add(_paramAuthorIDReturn);
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        result = (int)_paramAuthorIDReturn.Value; //has the auto-incremented value returned
+                        con.Close();
+                        return result;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result = 0;
+                this.LogException(ex);
+            }
+            return result;
+        }
+        public int CreateBookToDb(Book b,Author a)
+        {
+            int result;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCreateBook", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //@FirstName varchar(200),@LastName varchar(200),@Password varchar(200), @RoleID_FK int
+                        SqlParameter _paramTitle = _sqlCommand.CreateParameter();
+                        _paramTitle.DbType = DbType.String;
+                        _paramTitle.ParameterName = "@Title";
+                        _paramTitle.Value = b.Title;
+                        _sqlCommand.Parameters.Add(_paramTitle);
+                        //LastName
+                        SqlParameter _paramGenre = _sqlCommand.CreateParameter();
+                        _paramGenre.DbType = DbType.String;
+                        _paramGenre.ParameterName = "@Genre";
+                        _paramGenre.Value = b.Genre;
+                        _sqlCommand.Parameters.Add(_paramGenre);
+                        //Password
+                        SqlParameter _paramPublishedDate = _sqlCommand.CreateParameter();
+                        _paramPublishedDate.DbType = DbType.DateTime;
+                        _paramPublishedDate.ParameterName = "@Published_Date";
+                        _paramPublishedDate.Value = b.Published_Date;
+                        _sqlCommand.Parameters.Add(_paramPublishedDate);
+                        //RoleID_FK
+                        SqlParameter _paramFirstName = _sqlCommand.CreateParameter();
+                        _paramFirstName.DbType = DbType.String;
+                        _paramFirstName.ParameterName = "@AuthorFirstName";
+                        _paramFirstName.Value = a.FirstName;
+                        _sqlCommand.Parameters.Add(_paramFirstName);
+                        //Email
+                        SqlParameter _paramLastName = _sqlCommand.CreateParameter();
+                        _paramLastName.DbType = DbType.String;
+                        _paramLastName.ParameterName = "@AuthorLastName";
+                        _paramLastName.Value = a.LastName;
+                        _sqlCommand.Parameters.Add(_paramLastName);
+                        //Output value specs
+                        SqlParameter _paramUserIDReturn = _sqlCommand.CreateParameter();
+                        //auto-incremented specification
+                        _paramUserIDReturn.Direction = ParameterDirection.Output;
+                        _paramUserIDReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramUserIDReturn.ParameterName = "@BookID";
+                        var pk = _sqlCommand.Parameters.Add(_paramUserIDReturn);
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        result = (int)_paramUserIDReturn.Value; //has the auto-incremented value returned
+                        con.Close();
+                        return result;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result = 0;
+                this.LogException(ex);
+            }
+            return result;
+        }
         public bool LogException(Exception inException)
         {
+            bool result = false;
             using (SqlConnection con = new SqlConnection(_conn))
             {
                 //pass the name of the stored procedure and the connection
@@ -314,10 +567,10 @@ namespace ClassLibraryDatabase
                     con.Open();
                     _sqlCommand.ExecuteNonQuery(); //calls the sp
                     con.Close();
-                    return true;
+                    result = true;
                 }
             }
-            return false;
+            return result;
         }
         //D - 'DELETE' for CRUD
         public void DeleteAllRolesInDb()
@@ -401,6 +654,72 @@ namespace ClassLibraryDatabase
             {
                 this.LogException(ex);
             }
+        }
+        public bool DeleteAuthorInDb(Author a)
+        {
+            bool successful = false;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spDeleteAuthor", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+
+                        SqlParameter _paramAuthorID = _sqlCommand.CreateParameter();
+                        _paramAuthorID.DbType = DbType.Int32;
+                        _paramAuthorID.ParameterName = "@AuthorID";
+                        _paramAuthorID.Value = a.AuthorID;
+                        _sqlCommand.Parameters.Add(_paramAuthorID);
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        con.Close();
+                        successful = true;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in deleting author. You might have books that depend on this author");
+                this.LogException(ex);
+            }
+            return successful;
+        }
+        public bool DeleteBookInDb(Book b)
+        {
+            bool successful = false;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spDeleteBook", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+
+                        SqlParameter _paramBookID = _sqlCommand.CreateParameter();
+                        _paramBookID.DbType = DbType.Int32;
+                        _paramBookID.ParameterName = "@BookID";
+                        _paramBookID.Value = b.BookID;
+                        _sqlCommand.Parameters.Add(_paramBookID);
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        con.Close();
+                        successful = true;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in deleting book");
+                this.LogException(ex);
+            }
+            return successful;
         }
         //U - 'UPDATE' for CRUD
         public string UpdateRoleNameInDb(Role r,string new_RoleName)
@@ -595,7 +914,6 @@ namespace ClassLibraryDatabase
             }
             return LastName_result;
         }
-
         public string UpdateUserPasswordInDb(User u, string new_password)
         {
             string Password_result = null;
@@ -643,6 +961,153 @@ namespace ClassLibraryDatabase
                 this.LogException(ex);
             }
             return Password_result;
+        }
+        public int CountRolesInDb()
+        {
+            int count = -1;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCountRoles", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //output specs
+                        SqlParameter _paramRoleCountReturn = _sqlCommand.CreateParameter();
+                        _paramRoleCountReturn.Direction = ParameterDirection.Output;
+                        _paramRoleCountReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramRoleCountReturn.ParameterName = "@RoleCountOut";
+                        var pk = _sqlCommand.Parameters.Add(_paramRoleCountReturn);
+
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        count = (int)_paramRoleCountReturn.Value;
+                        con.Close();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            return count;
+        }
+        public int CountUsersInDb()
+        {
+            int count = -1;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCountUsers", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //output specs
+                        SqlParameter _paramUserCountReturn = _sqlCommand.CreateParameter();
+                        _paramUserCountReturn.Direction = ParameterDirection.Output;
+                        _paramUserCountReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramUserCountReturn.ParameterName = "@UserCountOut";
+                        var pk = _sqlCommand.Parameters.Add(_paramUserCountReturn);
+
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        count = (int)_paramUserCountReturn.Value;
+                        con.Close();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            return count;
+        }
+        public int CountAuthorsInDb()
+        {
+            int count = -1;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCountAuthors", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //output specs
+                        SqlParameter _paramUserCountReturn = _sqlCommand.CreateParameter();
+                        _paramUserCountReturn.Direction = ParameterDirection.Output;
+                        _paramUserCountReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramUserCountReturn.ParameterName = "@AuthorCountOut";
+                        var pk = _sqlCommand.Parameters.Add(_paramUserCountReturn);
+
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        count = (int)_paramUserCountReturn.Value;
+                        con.Close();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            return count;
+        }
+        public int CountBooksInDb()
+        {
+            int count = -1;
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_conn))
+                {
+                    //pass the name of the stored procedure and the connection
+                    using (SqlCommand _sqlCommand = new SqlCommand("spCountBooks", con))
+                    {
+                        _sqlCommand.CommandType = CommandType.StoredProcedure;
+                        _sqlCommand.CommandTimeout = 30;
+                        //output specs
+                        SqlParameter _paramUserCountReturn = _sqlCommand.CreateParameter();
+                        _paramUserCountReturn.Direction = ParameterDirection.Output;
+                        _paramUserCountReturn.DbType = DbType.Int32;
+                        //Getting the value that is being auto-incrememnted back
+                        _paramUserCountReturn.ParameterName = "@BookCountOut";
+                        var pk = _sqlCommand.Parameters.Add(_paramUserCountReturn);
+
+                        con.Open();
+                        _sqlCommand.ExecuteNonQuery(); //calls the sp
+                        count = (int)_paramUserCountReturn.Value;
+                        con.Close();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                this.LogException(ex);
+            }
+            return count;
+        }
+        public static T ConvertFromDBVal<T>(object obj)
+        {
+            if (obj == null || obj == DBNull.Value)
+            {
+                return default(T); // returns the default value for the type
+            }
+            else
+            {
+                return (T)obj;
+            }
         }
 
     }

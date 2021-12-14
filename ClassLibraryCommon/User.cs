@@ -14,14 +14,18 @@ namespace ClassLibraryCommon
         public string UserName { get; set; } // not null
         public string Password { get; set; } // not null
         public int RoleID_FK { get; set; } // null
+        public string Email { get; set; }  //null
+        public string PhoneNumber { get; set; } //null
 
-        public User(string firstname, string lastname, string username, string password, int roleid)
+        public User(string firstname, string lastname, string username, string password, int roleid,string email = null, string phonenumber = null)
         {
             this.FirstName = firstname;
             this.LastName = lastname;
             this.UserName = username;
             this.Password = password;
             this.RoleID_FK = roleid;
+            this.Email = email;
+            this.PhoneNumber = phonenumber;
         }
         public User(string firstname, string lastname, string username, string password)
         {

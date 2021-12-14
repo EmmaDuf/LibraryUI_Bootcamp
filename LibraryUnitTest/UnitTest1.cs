@@ -5,6 +5,7 @@ using ConsoleUI;
 using System.Collections.Generic;
 using ClassLibraryDatabase;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace LibraryUnitTest
 {
@@ -119,6 +120,41 @@ namespace LibraryUnitTest
             ado.DeleteRoleInDb(role_test);
             //assert
             Assert.AreEqual(result_roleid, expected_roleid);
+        }
+        [TestMethod]
+        public void AddAuthor_Db_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            Author author_test = new Author("Charlotte", "Brontë");
+            //act
+            int result_authorid = ado.CreateAuthorToDb(author_test);
+            author_test.AuthorID = result_authorid;
+            int expected_roleid = author_test.AuthorID;
+            ado.DeleteAuthorInDb(author_test);
+            //assert
+            Assert.AreEqual(result_authorid, expected_roleid);
+        }
+        [TestMethod]
+        public void AddBook_Db_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            Author author_test = new Author("Charlotte", "Brontë");
+            int result_authorid = ado.CreateAuthorToDb(author_test);
+            author_test.AuthorID = result_authorid;
+            DateTime published_date = new DateTime(1847, 10, 16);
+            Book book_test = new Book(author_test.AuthorID, "Jane Eyre", "Fiction", published_date);
+            //act
+            int result_bookid = ado.CreateBookToDb(book_test,author_test);
+            book_test.BookID = result_bookid;
+            int expected_bookid = book_test.BookID;
+            ado.DeleteAuthorInDb(author_test);
+            ado.DeleteBookInDb(book_test);
+            //assert
+            Assert.AreEqual(result_bookid, expected_bookid);
         }
         [TestMethod]
         public void DeleteUser_Db_Test()
@@ -289,6 +325,69 @@ namespace LibraryUnitTest
             Assert.AreEqual(role_test.RoleName, result);
         }
         [TestMethod]
+        public void GetAuthor_Db_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            Author author_test = new Author("Charlotte", "Brontë");
+            int result_authorid = ado.CreateAuthorToDb(author_test);
+            author_test.AuthorID = result_authorid;
+            Author author_test2 = new Author("F. Scott", "Fitzgerald");
+            int result_authorid2 = ado.CreateAuthorToDb(author_test2);
+            author_test2.AuthorID = result_authorid2;
+            //act
+            List<Author> authors = ado.GetAuthorsFromDb();
+            bool passed = false;
+            bool check1 = authors.Exists(author => author.AuthorID == author_test.AuthorID);
+            bool check2 = authors.Exists(author => author.AuthorID == author_test2.AuthorID);
+            if (authors.Exists(author => author.AuthorID == author_test.AuthorID) & authors.Exists(author => author.AuthorID == author_test2.AuthorID))
+            {
+                passed = true;
+            }
+            //assert
+            ado.DeleteAuthorInDb(author_test);
+            ado.DeleteAuthorInDb(author_test2);
+            Assert.IsTrue(passed);
+
+        }
+        [TestMethod]
+        public void GetBook_Db_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            //--authors
+            Author author_test = new Author("Charlotte", "Brontë");
+            int result_authorid = ado.CreateAuthorToDb(author_test);
+            author_test.AuthorID = result_authorid;
+            Author author_test2 = new Author("F. Scott", "Fitzgerald");
+            int result_authorid2 = ado.CreateAuthorToDb(author_test2);
+            author_test2.AuthorID = result_authorid2;
+            //--books
+            DateTime published_date = new DateTime(1847, 10, 16);
+            Book first_book = new Book(author_test.AuthorID, "Jane Eyre", "Fiction", published_date);
+            int result_bookid = ado.CreateBookToDb(first_book, author_test);
+            first_book.BookID = result_bookid;
+            DateTime published_date2 = new DateTime(1925, 4, 10);
+            Book second_book = new Book(author_test2.AuthorID, "The Great Gatsby", "Fiction", published_date);
+            result_bookid = ado.CreateBookToDb(second_book, author_test2);
+            second_book.BookID = result_bookid;
+            //act
+            List<Book> books = ado.GetBooksFromDb();
+            bool passed = false;
+            if (books.Exists(book => book.BookID == first_book.BookID) & books.Exists(book => book.BookID == second_book.BookID))
+            {
+                passed = true;
+            }
+            //assert
+            ado.DeleteAuthorInDb(author_test);
+            ado.DeleteAuthorInDb(author_test2);
+            ado.DeleteBookInDb(first_book);
+            ado.DeleteBookInDb(second_book);
+            Assert.IsTrue(passed);
+        }
+        [TestMethod]
         public void ExceptionLogging_Test()
         {
             //arrange
@@ -300,6 +399,99 @@ namespace LibraryUnitTest
             //assert
             Assert.IsTrue(executed);
         }
+        [TestMethod]
+        public void CountRolesInDb_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            //act
+            int count = ado.CountRolesInDb();
+            Assert.IsTrue(count >= 0);
+        }
+        [TestMethod]
+        public void CountUsersInDb_Test()
+        {
+            //arrange
+            string _connection = ConfigurationManager.ConnectionStrings["DBCONN"].ToString();
+            DbAdo ado = new DbAdo(_connection);
+            //act
+            int count = ado.CountUsersInDb();
+            Assert.IsTrue(count >= 0);
+        }
+        [TestMethod]
+        public void isNotPhoneNumber_Test()
+        {
+            string number_test = "763-276-5505 ";
+            string phonenumber_pattern = @"^[0-9]{3}-[0-9]{3}-[0-9]{4}$";
+            Regex phonenumber = new Regex(phonenumber_pattern);
+            MatchCollection matchednumbers = phonenumber.Matches(number_test);
+            bool results = true;
+            foreach(Match match in matchednumbers)
+            {
+                if (match.Value.Equals(number_test))
+                {
+                    results = false;
+                }
+            }
+            //assert
+            Assert.IsTrue(results);
+        }
+        [TestMethod]
+        public void isPhoneNumber_Test()
+        {
+            string number_test = "763-276-5555";
+            string phonenumber_pattern = @"^[0-9]{3}-[0-9]{3}-[0-9]{4}$";
+            Regex phonenumber = new Regex(phonenumber_pattern);
+            MatchCollection matchednumbers = phonenumber.Matches(number_test);
+            bool results = false;
+            foreach (Match match in matchednumbers)
+            {
+                if (match.Value.Equals(number_test))
+                {
+                    results = true;
+                }
+            }
+            //assert
+            Assert.IsTrue(results);
+        }
+        [TestMethod]
+        public void isEmail_Test(){
+            string email_test = "tes23t@something.com";
+            string email_pattern = @"^\w+@[A-z]{4,}\.[A-z]{3}$";
+            Regex email = new Regex(email_pattern);
+            MatchCollection matchedemails = email.Matches(email_test);
+            bool results = false;
+            foreach (Match match in matchedemails)
+            {
+                if (match.Value.Equals(email_test))
+                {
+                    results = true;
+                }
+            }
+            //assert
+            Assert.IsTrue(results);
+
+        }
+        [TestMethod]
+        public void isNotEmail_Test()
+        {
+            string email_test = "67@gm.com";
+            string email_pattern = @"^\w+@[A-z]{4,}\.[A-z]{3}$";
+            Regex email= new Regex(email_pattern);
+            MatchCollection matchedemails = email.Matches(email_test);
+            bool results = true;
+            foreach (Match match in matchedemails)
+            {
+                if (match.Value.Equals(email_test))
+                {
+                    results = false;
+                }
+            }
+            //assert
+            Assert.IsTrue(results);
+        }
+
 
     }
 }
